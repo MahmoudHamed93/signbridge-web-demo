@@ -174,13 +174,20 @@
       }
 
       /* In "window" mode, none of the .phone-* elements get any styling above, so
-         they render as plain, invisible, zero-effect empty <div>s stacked in the
-         normal flow before/after #root. .phone-frame/.phone-screen specifically
-         need height:100% so #root (height:100%/flex:1 from expo-reset) still has
-         something non-zero to measure against. */
+         they render as plain block <div>s stacked in the normal flow around
+         #root. .phone-frame/.phone-screen specifically need width/height:100% so
+         #root (height:100%/flex:1 from expo-reset, but only actually flexing when
+         its parent is itself a flex container -- it isn't here) has something
+         non-zero to fill; a block box defaults its own width to 100% of its
+         parent already, so only height needs stating explicitly, but pinning
+         both here removes any doubt. display is deliberately left alone (plain
+         "block", the same as before this shell existed) -- making .phone-frame a
+         flex container here (an earlier version of this rule did) turned
+         .phone-screen into a flex *item* with no flex-basis, collapsing it to
+         width: 0 instead of the 100% a plain block child gets automatically. */
       html[data-view-mode='window'] .phone-frame,
       html[data-view-mode='window'] .phone-screen {
-        display: flex;
+        width: 100%;
         height: 100%;
       }
       html[data-view-mode='window'] .phone-notch,
