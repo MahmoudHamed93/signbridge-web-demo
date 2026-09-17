@@ -188,22 +188,32 @@
          this element, and CSS always uses the larger of the two when they
          conflict -- overriding height without also overriding min-height left
          the box pinned at 52px regardless of what height said. */
-      html[data-view-mode='phone'] .phone-frame textarea {
-        height: 20px !important;
-        margin-bottom: 12px !important;
-        /* min-height: 20px !important was here to fight the app's own
-           min-height: 52px (COMPOSER.minHeight in constants/layout.ts) -- without
-           it, that 52px still wins (the browser always uses the larger of
-           height/min-height when they conflict), so the box renders at 52px tall
-           regardless of the height: 20px above. Padding stays zeroed either way
-           -- with the box now taller than one line of text needs, align-items:
-           center below is what keeps the text/placeholder vertically centered in
-           that extra space instead of stuck at the top with visible blank space
-           below it. */
+      /* Composer textarea: capped to a compact 52px box in both view modes --
+         real devices always land in "window" mode by default (see the auto-detect
+         script up top), so this ended up wanted there too, not just in the
+         simulator. Without an explicit height here the browser falls back to
+         sizing the box off its rows="5" attribute (~129px), which is *taller*
+         than the app's own min-height: 52px (COMPOSER.minHeight in
+         constants/layout.ts) and so silently wins over it -- min-height only ever
+         applies when it's the larger of the two, and intrinsic rows-based sizing
+         with no CSS height at all isn't bound by it. Padding is zeroed because
+         52px is barely more than this element's own 16px+16px padding + 2px
+         border added together, leaving almost no room for a line of text
+         otherwise; align-items: center keeps the (now unpadded) text/placeholder
+         looking vertically centered rather than pinned to the top edge. */
+      html[data-view-mode='phone'] .phone-frame textarea,
+      html[data-view-mode='window'] .phone-frame textarea {
+        height: 52px !important;
         padding-top: 0 !important;
         padding-bottom: 0 !important;
         display: flex !important;
         align-items: center !important;
+      }
+
+      /* Simulator-only extra breathing room below the composer -- window mode
+         (including real devices) keeps its original spacing here. */
+      html[data-view-mode='phone'] .phone-frame textarea {
+        margin-bottom: 12px !important;
       }
 
       /* In "window" mode, none of the .phone-* elements get any styling above, so
