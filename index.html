@@ -5,7 +5,9 @@
     <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <title>SignBridge</title>
-    <!-- The `react-native-web` recommended style reset: https://necolas.github.io/react-native-web/docs/setup/#root-element -->
+    <!-- The `react-native-web` recommended style reset: https://necolas.github.io/react-native-web/docs/setup/#root-element
+         Kept as-is; it still governs #root's own box, it's just that #root now lives
+         inside .phone-screen (the simulator's "glass") instead of directly in body. -->
     <style id="expo-reset">
       /* These styles make the body full-height */
       html,
@@ -23,6 +25,137 @@
         flex: 1;
       }
     </style>
+
+    <!--
+      Wraps the app in an iPhone-style simulator frame for desktop/tablet viewers —
+      this is purely a presentational shell around the same #root the RN Web app
+      always mounted into; nothing about the app itself changes. On an actual phone
+      (see the max-width media query at the bottom) the frame disables itself and
+      the app goes back to filling the real screen, since nobody wants a shrunk-down
+      fake phone rendered on their real one.
+    -->
+    <style id="simulator-shell">
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100%;
+        box-sizing: border-box;
+        padding: 32px 16px;
+        background: radial-gradient(circle at 50% 0%, #2a3a34 0%, #121815 60%, #0a0d0b 100%);
+      }
+
+      .phone-frame {
+        position: relative;
+        width: min(430px, 92vw);
+        aspect-ratio: 9 / 19.5;
+        max-height: calc(100vh - 64px);
+        border-radius: 54px;
+        background: linear-gradient(155deg, #3a3a3c, #161618 55%, #050505);
+        padding: 14px;
+        box-sizing: border-box;
+        box-shadow:
+          0 40px 80px -30px rgba(0, 0, 0, 0.65),
+          0 0 0 2px rgba(255, 255, 255, 0.06) inset,
+          0 0 0 1px rgba(0, 0, 0, 0.4);
+        flex-shrink: 0;
+      }
+
+      .phone-screen {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        border-radius: 40px;
+        overflow: hidden;
+        background: #000;
+        isolation: isolate;
+      }
+
+      /* The #root rule above already gives it height:100%/flex:1 — inside
+         .phone-screen that now means "fill the simulated screen" instead of
+         "fill the browser tab", which is exactly what we want. */
+
+      .phone-notch {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 38%;
+        max-width: 172px;
+        height: 26px;
+        background: #000;
+        border-radius: 0 0 18px 18px;
+        z-index: 20;
+        pointer-events: none;
+      }
+
+      .phone-home-indicator {
+        position: absolute;
+        bottom: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 34%;
+        max-width: 140px;
+        height: 5px;
+        border-radius: 3px;
+        background: rgba(255, 255, 255, 0.55);
+        z-index: 20;
+        pointer-events: none;
+      }
+
+      .phone-button {
+        position: absolute;
+        background: linear-gradient(90deg, #050505, #2a2a2c);
+        border-radius: 3px;
+      }
+      .phone-button--power {
+        right: -3px;
+        top: 22%;
+        width: 3px;
+        height: 90px;
+      }
+      .phone-button--volume-up {
+        left: -3px;
+        top: 18%;
+        width: 3px;
+        height: 55px;
+      }
+      .phone-button--volume-down {
+        left: -3px;
+        top: 27%;
+        width: 3px;
+        height: 55px;
+      }
+
+      /* Real phones don't need a fake phone drawn around them — below this width
+         (comfortably wider than any phone, narrower than a small tablet/landscape
+         phone) the frame chrome disables itself and the app fills the real
+         viewport exactly like it did before the simulator shell was added. */
+      @media (max-width: 700px) {
+        body {
+          padding: 0;
+          background: none;
+        }
+        .phone-frame {
+          width: 100%;
+          height: 100%;
+          max-height: none;
+          aspect-ratio: unset;
+          border-radius: 0;
+          padding: 0;
+          box-shadow: none;
+          background: none;
+        }
+        .phone-screen {
+          border-radius: 0;
+        }
+        .phone-notch,
+        .phone-home-indicator,
+        .phone-button {
+          display: none;
+        }
+      }
+    </style>
   </head>
 
   <body>
@@ -30,8 +163,18 @@
     <noscript>
       You need to enable JavaScript to run this app.
     </noscript>
-    <!-- The root element for your Expo app. -->
-    <div id="root"></div>
+
+    <div class="phone-frame">
+      <div class="phone-button phone-button--power"></div>
+      <div class="phone-button phone-button--volume-up"></div>
+      <div class="phone-button phone-button--volume-down"></div>
+      <div class="phone-screen">
+        <!-- The root element for your Expo app. -->
+        <div id="root"></div>
+        <div class="phone-notch"></div>
+        <div class="phone-home-indicator"></div>
+      </div>
+    </div>
   <script src="_expo/static/js/web/index-aa9e4ca9cd5d27cc4d34ccd2694a8ec6.js" defer></script>
 </body>
 </html>
