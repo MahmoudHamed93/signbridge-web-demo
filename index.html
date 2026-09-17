@@ -173,6 +173,21 @@
         height: 55px;
       }
 
+      /* The message-composer text box, shrunk down for the simulator's tighter
+         screen. Targeted by tag inside .phone-frame rather than one of RN Web's
+         own generated classes (those are content-hashed and can change on any
+         rebuild) -- this only ever matches the one <textarea> the composer
+         renders, and only while data-view-mode="phone", so "window" mode keeps
+         the composer's normal, unmodified size. !important because RN Web's own
+         atomic classes set height with a plain class selector of their own; this
+         selector already outranks a single class on specificity alone, but the
+         two together are setting the exact same property, so !important removes
+         any doubt about which one wins. */
+      html[data-view-mode='phone'] .phone-frame textarea {
+        height: 20px !important;
+        margin-bottom: 12px !important;
+      }
+
       /* In "window" mode, none of the .phone-* elements get any styling above, so
          they render as plain block <div>s stacked in the normal flow around
          #root. .phone-frame/.phone-screen specifically need width/height:100% so
