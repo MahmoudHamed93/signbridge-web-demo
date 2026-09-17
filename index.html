@@ -192,6 +192,16 @@
         height: 20px !important;
         min-height: 20px !important;
         margin-bottom: 12px !important;
+        /* The app's own vertical padding (16px top + 16px bottom) plus its 1px
+           border added up to 34px on their own -- more than the requested 20px
+           total -- so height/min-height alone floored here at 34px no matter what
+           they said (a border-box element can't render shorter than its own
+           padding + border). Zeroing padding is what actually makes 20px
+           reachable; at a 16px font size that leaves barely a sliver of room
+           around the text itself, so this is about as tight as 20px can look
+           without also shrinking the font. */
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
       }
 
       /* In "window" mode, none of the .phone-* elements get any styling above, so
