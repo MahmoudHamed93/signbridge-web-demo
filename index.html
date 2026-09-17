@@ -182,9 +182,15 @@
          atomic classes set height with a plain class selector of their own; this
          selector already outranks a single class on specificity alone, but the
          two together are setting the exact same property, so !important removes
-         any doubt about which one wins. */
+         any doubt about which one wins. min-height is set alongside height for
+         the same reason height alone didn't work at first: the app also sets its
+         own min-height (52px, from COMPOSER.minHeight in constants/layout.ts) on
+         this element, and CSS always uses the larger of the two when they
+         conflict -- overriding height without also overriding min-height left
+         the box pinned at 52px regardless of what height said. */
       html[data-view-mode='phone'] .phone-frame textarea {
         height: 20px !important;
+        min-height: 20px !important;
         margin-bottom: 12px !important;
       }
 
